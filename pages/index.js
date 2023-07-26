@@ -1,7 +1,26 @@
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
+import getStripe from '../lib/getStripe';
 
 export default function Home() {
+
+    async function HandleCheckOut(){
+        const stripe = await getStripe();
+        const {error} = await stripe.redirectToCheckout({
+          lineItems: [
+            {
+              price: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID,
+              quantity: 1,
+            }
+          ],
+          mode: "payment",
+          successUrl: "http://localhost:3000/success",
+          cancelUrl: "http://localhost:3000/cancel",
+          customerEmail: "vic.ezealor@gmail.com"
+        });
+        console.warn(error);
+    }
+
   return (
     <div className={styles.container}>
       <Head>
@@ -9,7 +28,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <button>Checkout</button>
+      <button onClick={HandleCheckOut}>Checkout</button>
 
       <style jsx>{`
         main {
@@ -19,6 +38,16 @@ export default function Home() {
           flex-direction: column;
           justify-content: center;
           align-items: center;
+        }
+        button {
+          height: 40px;
+          width: 150px;
+          background-color: black;
+          color: white;
+          font-size: 18px;
+          border-radius: 5px;
+          outline: 0;
+          border: 0;
         }
         footer {
           width: 100%;
